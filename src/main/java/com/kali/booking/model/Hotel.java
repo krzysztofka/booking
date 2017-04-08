@@ -1,13 +1,9 @@
 package com.kali.booking.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(
@@ -28,10 +24,6 @@ public class Hotel {
     @Size(min = 2, max = 50)
     @NotBlank
     private String city;
-
-    @OneToMany(mappedBy = "hotel")
-    @JsonIgnore
-    private List<Room> rooms = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -55,13 +47,5 @@ public class Hotel {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public List<Room> getRooms() {
-        return rooms;
-    }
-
-    public void setRooms(List<Room> rooms) {
-        this.rooms = rooms;
     }
 }

@@ -5,10 +5,10 @@ import org.apache.commons.lang3.RandomStringUtils
 
 class RoomValidationSpec extends ModelValidationSpecification {
 
-    def room = new Room()
+    def room = new Apartment()
 
     def setup() {
-        room = new Room()
+        room = new Apartment()
         room.setName("Some name")
         room.setDailyPrice(0L)
     }

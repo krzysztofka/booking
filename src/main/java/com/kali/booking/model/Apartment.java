@@ -7,14 +7,15 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Table(
-    name="room",
+    name="apartment",
     uniqueConstraints=
         @UniqueConstraint(columnNames={"hotel_id", "name"})
 )
-public class Room {
+public class Apartment {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

@@ -3,7 +3,7 @@ package com.kali.booking.controller;
 import com.jayway.restassured.http.ContentType;
 import com.kali.booking.AbstractSpringIT;
 import com.kali.booking.model.Hotel;
-import com.kali.booking.model.Room;
+import com.kali.booking.model.Apartment;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.springframework.test.context.jdbc.Sql;
@@ -12,12 +12,13 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.when;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @Sql({"/sql/clean-up.sql", "/sql/hotel-test-data.sql"})
 public class HotelControllerIT extends AbstractSpringIT {
 
     private static final String HOTEL_RESOURCE_PATH = "/booking-service/hotels";
+
+    private static final String HOTEL_ROOM_RESOURCE_PATH = "/booking-service/hotels/{hotelId}/apartments";
 
     @Test
     public void shouldGetHotel() {
@@ -58,7 +59,6 @@ public class HotelControllerIT extends AbstractSpringIT {
 
         assertEquals(hotel.getCity(), result.getCity());
         assertEquals(hotel.getName(), result.getName());
-        assertTrue(hotel.getRooms().isEmpty());
         assertNotNull(result.getId());
     }
 
@@ -96,17 +96,122 @@ public class HotelControllerIT extends AbstractSpringIT {
 
     @Test
     public void shouldGetHotelRoom() {
-        Room result = when()
-                .get(joinPaths(HOTEL_RESOURCE_PATH , "-10", "rooms", "-11"))
+        Apartment result = when()
+                .get(joinPaths(HOTEL_ROOM_RESOURCE_PATH, "-11"), -10L)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .extract().as(Room.class);
+                .extract().as(Apartment.class);
 
         assertEquals("Room 1", result.getName());
         assertEquals(Long.valueOf(10000L), result.getDailyPrice());
         assertEquals(Long.valueOf(-11L), result.getId());
         assertEquals(Long.valueOf(-10L), result.getHotel().getId());
     }
+
+    @Test
+    public void shouldGet404WhenHotelDoesNotExist() {
+        when()
+                .get(joinPaths(HOTEL_ROOM_RESOURCE_PATH, "-11"), -11L)
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
+    public void shouldGet404WhenRoomDoesNotExist() {
+        when()
+                .get(joinPaths(HOTEL_ROOM_RESOURCE_PATH, "-1"), -10L)
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
+    public void shouldRegisterNewHotelRoom() {
+        Apartment room = new Apartment();
+        room.setName("New room");
+        room.setDailyPrice(1000L);
+
+        Apartment result = given()
+                .contentType("application/json")
+                .content(room)
+                .when()
+                .accept(ContentType.JSON)
+                .post(HOTEL_ROOM_RESOURCE_PATH, -10L)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(Apartment.class);
+
+        assertEquals(Long.valueOf(-10L), result.getHotel().getId());
+        assertEquals(room.getName(), result.getName());
+        assertEquals(room.getDailyPrice(), result.getDailyPrice());
+        assertNotNull(result.getId());
+    }
+
+    @Test
+    public void shouldNotRegisterADuplicateRoom() {
+        Apartment room = new Apartment();
+        room.setName("Room 1");
+        room.setDailyPrice(1000L);
+
+        given()
+                .contentType("application/json")
+                .content(room)
+                .when()
+                .accept(ContentType.JSON)
+                .post(HOTEL_ROOM_RESOURCE_PATH, -10L)
+                .then()
+                .statusCode(HttpStatus.SC_CONFLICT);
+    }
+
+    @Test
+    public void shouldNotRegisterInvalidRoom() {
+        Apartment room = new Apartment();
+        room.setName("Name");
+        room.setDailyPrice(-100L);
+
+        given()
+                .contentType("application/json")
+                .content(room)
+                .when()
+                .accept(ContentType.JSON)
+                .post(HOTEL_ROOM_RESOURCE_PATH,  -10L)
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void shouldNotRegisterRoomToNonExistingHotel() {
+        Apartment room = new Apartment();
+        room.setName("Name");
+        room.setDailyPrice(100L);
+
+        given()
+                .contentType("application/json")
+                .content(room)
+                .when()
+                .accept(ContentType.JSON)
+                .post(HOTEL_ROOM_RESOURCE_PATH,  -100000L)
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
+    }
+
+
+    @Test
+    public void shouldGetAvailableApartments() {
+        given()
+                .queryParam("city", "Warsaw")
+                .queryParam("priceFrom", 10000)
+                .queryParam("priceTo", 12000L)
+                .queryParam("page", 0)
+                .queryParam("size", 10)
+                .when()
+                .accept(ContentType.JSON)
+                .get(joinPaths(HOTEL_RESOURCE_PATH, "available-apartments"))
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+    }
+
+
 
 
 }

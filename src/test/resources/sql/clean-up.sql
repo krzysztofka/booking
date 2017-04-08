@@ -1,3 +1,4 @@
+delete from booking;
 delete from user;
-delete from room;
+delete from apartment;
 delete from hotel;

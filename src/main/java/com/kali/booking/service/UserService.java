@@ -1,5 +1,6 @@
 package com.kali.booking.service;
 
+import com.google.common.base.Preconditions;
 import com.kali.booking.exceptions.DataConflictException;
 import com.kali.booking.exceptions.EntityNotFoundException;
 import com.kali.booking.model.User;
@@ -21,17 +22,18 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public User getUser(Long id) {
+        Optional<User> user = Optional.ofNullable(userRepository.findOne(id));
+        return user.orElseThrow(EntityNotFoundException::new);
+    }
+
     @Transactional
     public User registerUser(User user) {
+        Preconditions.checkArgument(user.getId() == null);
         try {
             return userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new DataConflictException("User with given email already exists");
         }
-    }
-
-    public User getUser(Long id) {
-        Optional<User> user = Optional.ofNullable(userRepository.findOne(id));
-        return user.orElseThrow(EntityNotFoundException::new);
     }
 }

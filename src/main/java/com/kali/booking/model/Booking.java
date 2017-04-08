@@ -1,12 +1,69 @@
 package com.kali.booking.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Date;
 
+@Entity
 public class Booking {
 
-    private LocalDate from;
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Long id;
 
-    private LocalDate to;
+    @Column(nullable = false, name = "from_date")
+    @Temporal(TemporalType.DATE)
+    private Date from;
 
-    private Room room;
+    @Column(nullable = false, name = "to_date")
+    @Temporal(TemporalType.DATE)
+    private Date to;
+
+    @ManyToOne
+    @JoinColumn(name = "apartment_id", nullable = false)
+    private Apartment apartment;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Date getFrom() {
+        return from;
+    }
+
+    public void setFrom(Date from) {
+        this.from = from;
+    }
+
+    public Date getTo() {
+        return to;
+    }
+
+    public void setTo(Date to) {
+        this.to = to;
+    }
+
+    public Apartment getApartment() {
+        return apartment;
+    }
+
+    public void setApartment(Apartment apartment) {
+        this.apartment = apartment;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

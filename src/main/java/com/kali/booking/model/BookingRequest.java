@@ -4,11 +4,9 @@ import java.util.Date;
 
 public class BookingRequest {
 
-    private Long hotelId;
-
     private Long userId;
 
-    private Long roomId;
+    private Long apartmentId;
 
     private Date from;
 
@@ -17,28 +15,19 @@ public class BookingRequest {
     public BookingRequest() {
     }
 
-    public BookingRequest(Long hotelId, Long userId, Long roomId, Date from, Date to) {
-        this.hotelId = hotelId;
+    public BookingRequest(Long userId, Long apartmentId, Date from, Date to) {
         this.userId = userId;
-        this.roomId = roomId;
+        this.apartmentId = apartmentId;
         this.from = from;
         this.to = to;
     }
 
-    public Long getHotelId() {
-        return hotelId;
+    public Long getApartmentId() {
+        return apartmentId;
     }
 
-    public void setHotelId(Long hotelId) {
-        this.hotelId = hotelId;
-    }
-
-    public Long getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
+    public void setApartmentId(Long apartmentId) {
+        this.apartmentId = apartmentId;
     }
 
     public Date getFrom() {
@@ -63,5 +52,15 @@ public class BookingRequest {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "BookingRequest{" +
+                "userId=" + userId +
+                ", apartmentId=" + apartmentId +
+                ", from=" + from +
+                ", to=" + to +
+                '}';
     }
 }
