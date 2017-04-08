@@ -8,5 +8,10 @@ spring:
     serialization-inclusion: non_null
   jpa:
     generate-ddl: true
+  h2:
+    console.enabled: true
 
+logging:
+  level:
+    root: INFO
 ---

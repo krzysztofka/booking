@@ -1,6 +1,11 @@
 package com.kali.booking.model;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 public class User {
@@ -9,9 +14,13 @@ public class User {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
+    @Email
+    @NotBlank
     @Column(unique = true)
     private String email;
 
+    @Size(min = 2, max = 50)
+    @NotBlank
     private String name;
 
     public Long getId() {

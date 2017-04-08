@@ -7,9 +7,12 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.StringJoiner;
+import java.util.stream.Stream;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AbstractSpringIT {
+public abstract class AbstractSpringIT {
 
     @LocalServerPort
     private int port;
@@ -17,6 +20,12 @@ public class AbstractSpringIT {
     @Before
     public void setUp() {
         RestAssured.port = port;
+    }
+
+    protected String joinPaths(String... values) {
+        StringJoiner joiner = new StringJoiner("/");
+        Stream.of(values).forEach(joiner::add);
+        return joiner.toString();
     }
 
 }
