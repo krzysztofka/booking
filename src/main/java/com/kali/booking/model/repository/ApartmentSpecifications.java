@@ -1,17 +1,14 @@
 package com.kali.booking.model.repository;
 
-import com.google.common.collect.Lists;
 import com.kali.booking.model.Apartment;
 
 import com.kali.booking.model.Booking;
 import com.kali.booking.model.BookingStatus;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.util.Date;
-import java.util.List;
 
 public final class ApartmentSpecifications {
 
@@ -35,13 +32,12 @@ public final class ApartmentSpecifications {
             Subquery<Long> bookingSubQuery = query.subquery(Long.class);
             Root<Booking> booking = bookingSubQuery.from(Booking.class);
 
-            List<Predicate> predicateList = Lists.newArrayList();
-            predicateList.add(cb.notEqual(booking.get("status"), BookingStatus.CANCELED));
-            predicateList.add(cb.greaterThan(booking.get("to"), from));
-            predicateList.add(cb.lessThan(booking.get("from"), to));
-
-            bookingSubQuery.where(predicateList.toArray(new Predicate[predicateList.size()]));
             bookingSubQuery.select(booking.get("apartment").get("id"));
+
+            bookingSubQuery.where(
+                    cb.notEqual(booking.get("status"), BookingStatus.CANCELED),
+                    cb.greaterThan(booking.get("to"), from),
+                    cb.lessThan(booking.get("from"), to));
 
             return cb.in(apartment.get("id")).value(bookingSubQuery).not();
         };

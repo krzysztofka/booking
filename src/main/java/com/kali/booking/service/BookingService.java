@@ -7,7 +7,10 @@ import com.kali.booking.model.*;
 import com.kali.booking.model.repository.ApartmentRepository;
 import com.kali.booking.model.repository.BookingRepository;
 import com.kali.booking.model.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +19,8 @@ import java.util.Optional;
 
 @Service
 public class BookingService {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(BookingService.class);
 
     private final UserRepository userRepository;
     private final ApartmentRepository apartmentRepository;
@@ -48,8 +53,7 @@ public class BookingService {
         User user = Optional.ofNullable(userRepository.findOne(bookingRequest.getUserId()))
                 .orElseThrow(InvalidRequestException::new);
 
-        Apartment apartment = apartmentRepository.findById(bookingRequest.getApartmentId())
-                .orElseThrow(InvalidRequestException::new);
+        Apartment apartment = getApartmentWithLock(bookingRequest.getApartmentId());
 
         checkIfBookingPossible(bookingRequest);
 
@@ -61,6 +65,15 @@ public class BookingService {
         booking.setStatus(BookingStatus.BOOKED);
 
         return bookingRepository.save(booking);
+    }
+
+    private Apartment getApartmentWithLock(Long apartmentId) {
+        try {
+            return apartmentRepository.findById(apartmentId).orElseThrow(InvalidRequestException::new);
+        } catch (PessimisticLockingFailureException e) {
+            LOGGER.error("Pessimistic lock exception:", e);
+            throw new DataConflictException("Booking currently impossible. Try again.");
+        }
     }
 
     private void checkIfBookingPossible(BookingRequest bookingRequest) {
