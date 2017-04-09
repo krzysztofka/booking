@@ -12,7 +12,7 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.H2Dialect
   datasource:
-    url: jdbc:h2:mem:mydb;LOCK_TIMEOUT=5000
+    url: jdbc:h2:mem:mydb;LOCK_TIMEOUT=5000;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
     driverClassName: org.h2.Driver
