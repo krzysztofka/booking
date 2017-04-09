@@ -36,10 +36,15 @@ Installation
 
 API
 ---
-For now The best way to check API is via controller acceptance tests:
+For now The best way to check API is via rest controller acceptance tests:
 * `com.kali.booking.controller.BookingControllerIT`
 * `com.kali.booking.controller.HotelControllerIT`
 * `com.kali.booking.controller.UserControllerIT`
+
+DATABASE
+--------
+Booking uses embedded H2 database.
+You can access h2 console via `http://localhost:7000/booking-service/h2-console`
 
 CURL's
 ------
