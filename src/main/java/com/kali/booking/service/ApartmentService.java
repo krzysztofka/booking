@@ -58,7 +58,7 @@ public class ApartmentService {
         specifications.removeIf(Objects::isNull);
 
         Specifications<Apartment> specification = null;
-        for (Specification s : specifications) {
+        for (Specification<Apartment> s : specifications) {
             specification = specification == null ? Specifications.where(s) : specification.and(s);
         }
 
