@@ -6,7 +6,7 @@ What is it?
 Booking is a simple Spring Boot application solving simple scenario of hotel apartment reservation.
 
 
-Current functioanllity
+Current functioanlity
 -----------------------
 
 * Hotel registration
@@ -36,7 +36,7 @@ Installation
 
 API
 ---
-For now The best way to check API is via rest controller acceptance tests:
+For now the best way to check API is via rest controller acceptance tests:
 * `com.kali.booking.controller.BookingControllerIT`
 * `com.kali.booking.controller.HotelControllerIT`
 * `com.kali.booking.controller.UserControllerIT`
