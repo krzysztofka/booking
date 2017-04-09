@@ -2,21 +2,21 @@ package com.kali.booking.service;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.kali.booking.exceptions.DataConflictException;
-import com.kali.booking.exceptions.EntityNotFoundException;
+import com.kali.booking.exception.DataConflictException;
+import com.kali.booking.exception.EntityNotFoundException;
 import com.kali.booking.model.ApartmentSearchCriteria;
 import com.kali.booking.model.Hotel;
 import com.kali.booking.model.Apartment;
 import com.kali.booking.model.repository.ApartmentRepository;
+import com.kali.booking.model.repository.ApartmentSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -44,9 +44,25 @@ public class ApartmentService {
          }
     }
 
-    @Transactional
-    public Page<Apartment> getAvailableApartments(ApartmentSearchCriteria searchCriteria, int page, int size) {
-        Pageable pageable = new PageRequest(page, size);
-        return apartmentRepository.getAvailableApartments(searchCriteria, pageable);
+    public List<Apartment> getAvailableApartments(ApartmentSearchCriteria searchCriteria) {
+        Specification<Apartment> specification = toSpecification(searchCriteria);
+        return apartmentRepository.findAll(specification);
+    }
+
+    private Specification<Apartment> toSpecification(ApartmentSearchCriteria searchCriteria) {
+        List<Specification<Apartment>> specifications = Lists.newArrayList(
+                ApartmentSpecifications.apartmentInCity(searchCriteria.getCity()),
+                ApartmentSpecifications.priceFrom(searchCriteria.getPriceFrom()),
+                ApartmentSpecifications.priceTo(searchCriteria.getPriceTo()),
+                ApartmentSpecifications.bookingTime(searchCriteria.getFrom(), searchCriteria.getTo()));
+        specifications.removeIf(Objects::isNull);
+
+        Specifications<Apartment> specification = null;
+        for (Specification s : specifications) {
+            specification = specification == null ? Specifications.where(s) : specification.and(s);
+        }
+
+        return specification;
+
     }
 }

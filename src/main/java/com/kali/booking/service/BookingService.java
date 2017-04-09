@@ -1,22 +1,17 @@
 package com.kali.booking.service;
 
-import com.kali.booking.exceptions.DataConflictException;
-import com.kali.booking.exceptions.EntityNotFoundException;
-import com.kali.booking.exceptions.InvalidRequestException;
-import com.kali.booking.model.Apartment;
-import com.kali.booking.model.Booking;
-import com.kali.booking.model.BookingRequest;
-import com.kali.booking.model.User;
+import com.kali.booking.exception.DataConflictException;
+import com.kali.booking.exception.EntityNotFoundException;
+import com.kali.booking.exception.InvalidRequestException;
+import com.kali.booking.model.*;
 import com.kali.booking.model.repository.ApartmentRepository;
 import com.kali.booking.model.repository.BookingRepository;
 import com.kali.booking.model.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,13 +29,18 @@ public class BookingService {
     }
 
     public Booking getBooking(Long id) {
-        return Optional.ofNullable(bookingRepository.findOne(id))
+        return bookingRepository.findByIdAndStatusNot(id, BookingStatus.CANCELED)
                 .orElseThrow(EntityNotFoundException::new);
     }
 
-    public Page<Booking> getUserBookings(Long userId, int page, int size) {
-        Pageable pageable = new PageRequest(page, size);
-        return bookingRepository.findByUserId(userId, pageable);
+    public List<Booking> getUserBookings(Long userId) {
+        return bookingRepository.findByUserIdAndStatusNot(userId, BookingStatus.CANCELED);
+    }
+
+    @Transactional
+    public void cancelBooking(Long id) {
+        Booking booking = getBooking(id);
+        booking.setStatus(BookingStatus.CANCELED);
     }
 
     @Transactional
@@ -51,7 +51,6 @@ public class BookingService {
         Apartment apartment = apartmentRepository.findById(bookingRequest.getApartmentId())
                 .orElseThrow(InvalidRequestException::new);
 
-        //TODO: test lock
         checkIfBookingPossible(bookingRequest);
 
         Booking booking = new Booking();
@@ -59,6 +58,7 @@ public class BookingService {
         booking.setUser(user);
         booking.setFrom(bookingRequest.getFrom());
         booking.setTo(bookingRequest.getTo());
+        booking.setStatus(BookingStatus.BOOKED);
 
         return bookingRepository.save(booking);
     }

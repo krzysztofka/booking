@@ -12,7 +12,7 @@ class UserValidationSpec extends ModelValidationSpecification {
         user.setEmail("email@email.com")
     }
 
-    def "should pass user validation"() {
+    def "should pass validation"() {
         when:
         def validationResult = validator.validate(user)
 

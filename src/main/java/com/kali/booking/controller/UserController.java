@@ -27,14 +27,12 @@ public class UserController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public User getUser(@PathVariable("id") Long id) {
         LOGGER.info("Get user: {}", id);
-
         return userService.getUser(id);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public User registerUser(@RequestBody @Valid User user) {
         LOGGER.info("Register user: {}", user.getEmail());
-
         return userService.registerUser(user);
     }
 }

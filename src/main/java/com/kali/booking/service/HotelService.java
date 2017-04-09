@@ -1,8 +1,8 @@
 package com.kali.booking.service;
 
 import com.google.common.base.Preconditions;
-import com.kali.booking.exceptions.DataConflictException;
-import com.kali.booking.exceptions.EntityNotFoundException;
+import com.kali.booking.exception.DataConflictException;
+import com.kali.booking.exception.EntityNotFoundException;
 import com.kali.booking.model.Hotel;
 import com.kali.booking.model.repository.HotelRepository;
 import org.springframework.beans.factory.annotation.Autowired;

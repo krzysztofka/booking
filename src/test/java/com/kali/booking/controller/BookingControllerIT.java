@@ -5,6 +5,7 @@ import com.kali.booking.AbstractSpringIT;
 import com.kali.booking.model.Booking;
 import com.kali.booking.model.BookingRequest;
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -31,6 +32,14 @@ public class BookingControllerIT extends AbstractSpringIT {
         assertEquals(toDate(2017, 10, 10), result.getFrom());
         assertEquals(toDate(2017, 10, 12), result.getTo());
         assertNotNull(result.getId());
+    }
+
+    @Test
+    public void shouldGet404WhenBookingNotFound() {
+        when()
+                .get(joinPaths(BOOKING_RESOURCE_PATH , "-21212"))
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
     @Test
@@ -69,8 +78,81 @@ public class BookingControllerIT extends AbstractSpringIT {
     }
 
     @Test
-    public void shouldGetUserBookings() {
-        //TODO
+    public void shouldNotRegisterBookingForNonExistingUser() {
+        BookingRequest request = new BookingRequest(-100L, -1L, toDate(2017, 10, 11), toDate(2017, 10, 14));
+
+        given()
+                .contentType("application/json")
+                .content(request)
+                .when()
+                .accept(ContentType.JSON)
+                .post(BOOKING_RESOURCE_PATH)
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
     }
 
+    @Test
+    public void shouldNotRegisterBookingForNonExistingApartment() {
+        BookingRequest request = new BookingRequest(-1L, -100L, toDate(2017, 10, 11), toDate(2017, 10, 14));
+
+        given()
+                .contentType("application/json")
+                .content(request)
+                .when()
+                .accept(ContentType.JSON)
+                .post(BOOKING_RESOURCE_PATH)
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void shouldGetUserBookings() {
+        Booking[] bookings = given()
+                .queryParam("userId", "-1")
+                .when()
+                .get(BOOKING_RESOURCE_PATH)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .as(Booking[].class);
+
+        Assert.assertEquals(1, bookings.length);
+        Assert.assertEquals(Long.valueOf(-1), bookings[0].getId());
+        Assert.assertEquals("Room 1", bookings[0].getApartment().getName());
+    }
+
+    @Test
+    public void shouldGetNoBookingForUnknownUser() {
+        Booking[] bookings = given()
+                .queryParam("userId", "-3")
+                .when()
+                .get(BOOKING_RESOURCE_PATH)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
+                .as(Booking[].class);
+
+        Assert.assertEquals(0, bookings.length);
+    }
+
+    @Test
+    public void shouldCancelBooking() {
+        when()
+                .delete(joinPaths(BOOKING_RESOURCE_PATH , "-1"))
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+
+        when()
+                .get(joinPaths(BOOKING_RESOURCE_PATH , "-1"))
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
+    }
+
+    @Test
+    public void shouldGet404WhenCancelingNotFoundBooking() {
+        when()
+                .delete(joinPaths(BOOKING_RESOURCE_PATH , "-10000"))
+                .then()
+                .statusCode(HttpStatus.SC_NOT_FOUND);
+    }
 }

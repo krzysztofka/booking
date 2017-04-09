@@ -1,15 +1,25 @@
 package com.kali.booking.model;
 
+import com.kali.booking.model.validations.DateRange;
+
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+@DateRange(from = "from", to = "to")
 public class BookingRequest {
 
+    @NotNull
     private Long userId;
 
+    @NotNull
     private Long apartmentId;
 
+    @Future
+    @NotNull
     private Date from;
 
+    @NotNull
     private Date to;
 
     public BookingRequest() {

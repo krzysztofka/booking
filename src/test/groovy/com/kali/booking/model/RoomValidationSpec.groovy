@@ -13,7 +13,7 @@ class RoomValidationSpec extends ModelValidationSpecification {
         room.setDailyPrice(0L)
     }
 
-    def "should pass room validation"() {
+    def "should pass validation"() {
         when:
         def validationResult = validator.validate(room)
 

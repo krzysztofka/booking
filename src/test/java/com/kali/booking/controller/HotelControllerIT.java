@@ -5,6 +5,7 @@ import com.kali.booking.AbstractSpringIT;
 import com.kali.booking.model.Hotel;
 import com.kali.booking.model.Apartment;
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -194,24 +195,29 @@ public class HotelControllerIT extends AbstractSpringIT {
                 .statusCode(HttpStatus.SC_NOT_FOUND);
     }
 
-
     @Test
     public void shouldGetAvailableApartments() {
-        given()
-                .queryParam("city", "Warsaw")
+        String city = "Warsaw";
+
+        Apartment[] apartments = given()
+                .queryParam("city", city)
                 .queryParam("priceFrom", 10000)
                 .queryParam("priceTo", 12000L)
+                .queryParam("from", "2160-10-10")
+                .queryParam("to", "2160-10-12")
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .when()
                 .accept(ContentType.JSON)
                 .get(joinPaths(HOTEL_RESOURCE_PATH, "available-apartments"))
                 .then()
-                .statusCode(HttpStatus.SC_OK);
+                .statusCode(HttpStatus.SC_OK)
+                .extract().as(Apartment[].class);
 
+        Assert.assertEquals(1, apartments.length);
+        Assert.assertEquals(Long.valueOf(-11), apartments[0].getId());
+        Assert.assertEquals("Room 1", apartments[0].getName());
+        Assert.assertEquals(Long.valueOf(10000L), apartments[0].getDailyPrice());
+        Assert.assertEquals(city, apartments[0].getHotel().getCity());
     }
-
-
-
-
 }

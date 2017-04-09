@@ -12,7 +12,7 @@ class HotelValidationSpec extends ModelValidationSpecification {
         hotel.setCity("some city")
     }
 
-    def "should pass hotel validation"() {
+    def "should pass validation"() {
         when:
         def validationResult = validator.validate(hotel)
 

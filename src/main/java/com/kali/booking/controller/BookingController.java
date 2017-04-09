@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @Validated
 @RequestMapping("/bookings")
-public class BookingController extends AbstractRestController {
+public class BookingController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingController.class);
 
@@ -33,17 +33,20 @@ public class BookingController extends AbstractRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Booking getBooking(@PathVariable Long id) {
+    public Booking getBooking(@PathVariable("id") Long id) {
         LOGGER.info("Get booking: {}", id);
         return bookingService.getBooking(id);
     }
 
     @RequestMapping(params = {"userId"}, method = RequestMethod.GET)
-    public List<Booking> getUserBookings(@RequestParam("page") int page,
-                                         @RequestParam("size") int size,
-                                         @RequestParam("userId") Long userId) {
-        //TODO hateoas
+    public List<Booking> getUserBookings(@RequestParam("userId") Long userId) {
         LOGGER.info("Get user booking: {}", userId);
-        return bookingService.getUserBookings(userId, page, size).getContent();
+        return bookingService.getUserBookings(userId);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public void cancelBooking(@PathVariable("id") Long id) {
+        LOGGER.info("Cancel booking: {}", id);
+        bookingService.cancelBooking(id);
     }
 }

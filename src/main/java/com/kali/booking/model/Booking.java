@@ -1,10 +1,12 @@
 package com.kali.booking.model;
 
+import com.kali.booking.model.validations.DateRange;
+
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
+@DateRange(from = "from", to = "to")
 public class Booking {
 
     @Id
@@ -26,6 +28,10 @@ public class Booking {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BookingStatus status;
 
     public Long getId() {
         return id;
@@ -65,5 +71,13 @@ public class Booking {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public BookingStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BookingStatus status) {
+        this.status = status;
     }
 }

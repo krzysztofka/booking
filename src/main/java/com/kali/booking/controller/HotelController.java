@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.util.List;
 
@@ -58,10 +57,8 @@ public class HotelController {
     }
 
     @RequestMapping(value = "/available-apartments", method = RequestMethod.GET)
-    public List<Apartment> getAvailableApartments(@RequestParam("page") int page,
-                                                  @RequestParam("size") int size,
-                                                  @Valid ApartmentSearchCriteria apartmentSearchCriteria) {
+    public List<Apartment> getAvailableApartments(@Valid ApartmentSearchCriteria apartmentSearchCriteria) {
         LOGGER.info("Get available apartments for criteria: {}", apartmentSearchCriteria);
-        return apartmentService.getAvailableApartments(apartmentSearchCriteria, page, size).getContent();
+        return apartmentService.getAvailableApartments(apartmentSearchCriteria);
     }
 }
