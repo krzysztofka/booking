@@ -193,15 +193,6 @@
                             <goal>report-integration</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>jacoco-check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <rules />
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>
