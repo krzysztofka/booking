@@ -1,4 +1,6 @@
-# booking [![Build Status](https://travis-ci.org/krzysztofka/booking.svg)](http://travis-ci.org/krzysztofka/booking?branch=master)
+# booking
+[![Build Status](https://travis-ci.org/krzysztofka/booking.svg)](http://travis-ci.org/krzysztofka/booking?branch=master)
+[![codecov](https://codecov.io/gh/krzysztofka/booking/branch/master/graph/badge.svg)](https://codecov.io/gh/krzysztofka/booking)
 
 What is it?
 -----------
